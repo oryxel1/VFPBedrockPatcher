@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "vfpbedrockpatcher",
+  "version": "${version}",
+  "name": "VFPBedrockPatcher",
+  "description": "Various fixes and improvements to make ViaBedrock playable on VFP.  ",
+  "authors": [],
+  "contact": {},
+  "license": "GPL-3.0",
+  "icon": "assets/vfpbedrockpatcher/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "com.vfpbedrock.patcher.fabric.FabricMod"
+    ]
+  },
+  "mixins": [
+    "vfpbedrockpatcher.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
