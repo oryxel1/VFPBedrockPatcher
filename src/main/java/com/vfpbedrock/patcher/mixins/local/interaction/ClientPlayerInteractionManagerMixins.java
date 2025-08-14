@@ -21,10 +21,6 @@ public class ClientPlayerInteractionManagerMixins {
     @Redirect(method = "attackBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isBlockBreakingRestricted(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/world/GameMode;)Z"))
     public boolean doBedrockProtectedArea(ClientPlayerEntity instance, World world, BlockPos blockPos, GameMode gameMode) {
         boolean old = instance.isBlockBreakingRestricted(world, blockPos, gameMode);
-        if (((Object)this) != MinecraftClient.getInstance().player) {
-            return old;
-        }
-
         if (ViaFabricPlus.getImpl().getTargetVersion() != BedrockProtocolVersion.bedrockLatest) {
             return old;
         }
@@ -35,7 +31,11 @@ public class ClientPlayerInteractionManagerMixins {
         }
 
         final GameSessionStorage gameSession = user.get(GameSessionStorage.class);
-        final net.raphimc.viabedrock.api.model.entity.ClientPlayerEntity clientPlayer = user.get(EntityTracker.class).getClientPlayer();
-        return !gameSession.isImmutableWorld() && clientPlayer.abilities().getBooleanValue(AbilitiesIndex.Mine);
+        final EntityTracker entityTracker = user.get(EntityTracker.class);
+        if (gameSession == null || entityTracker == null) {
+            return old;
+        }
+
+        return gameSession.isImmutableWorld() || !entityTracker.getClientPlayer().abilities().getBooleanValue(AbilitiesIndex.Mine);
     }
 }
