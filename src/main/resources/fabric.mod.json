@@ -7,7 +7,6 @@
   "authors": [],
   "contact": {},
   "license": "GPL-3.0",
-  "icon": "assets/vfpbedrockpatcher/icon.png",
   "environment": "*",
   "entrypoints": {
     "client": [

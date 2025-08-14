@@ -1,6 +1,11 @@
+import net.raphimc.viabedrock.generator.EnumGeneratorTask
+
 plugins {
     id 'fabric-loom' version '1.11-SNAPSHOT'
     id 'maven-publish'
+
+    id "java-library"
+    id "org.jetbrains.gradle.plugin.idea-ext" version "1.1.10"
 }
 
 version = project.mod_version
@@ -42,7 +47,7 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-    modImplementation "com.viaversion:viafabricplus-api:4.2.4"
+    modImplementation "com.viaversion:viafabricplus:4.2.4"
 
     compileOnly "net.lenni0451:Reflect:1.5.0"
 }
@@ -62,10 +67,6 @@ processResources {
 
 def targetJavaVersion = 21
 tasks.withType(JavaCompile).configureEach {
-    // ensure that the encoding is set to UTF-8, no matter what the system default is
-    // this fixes some edge cases with special characters not displaying correctly
-    // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
-    // If Javadoc is generated, this must be specified in that task too.
     it.options.encoding = "UTF-8"
     if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
         it.options.release.set(targetJavaVersion)
@@ -77,9 +78,6 @@ java {
     if (JavaVersion.current() < javaVersion) {
         toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
     }
-    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-    // if it is present.
-    // If you remove this line, sources will not be generated.
     withSourcesJar()
 }
 
@@ -89,20 +87,12 @@ jar {
     }
 }
 
-// configure the maven publication
-publishing {
-    publications {
-        create("mavenJava", MavenPublication) {
-            artifactId = project.archives_base_name
-            from components.java
-        }
-    }
-
-    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-    repositories {
-        // Add repositories to publish to here.
-        // Notice: This block does NOT have the same function as the block in the top level.
-        // The repositories here will be used for publishing your artifact, not for
-        // retrieving dependencies.
-    }
+def enumSourceDir = layout.buildDirectory.dir("generated/enums/main/java")
+def enumGeneratorTask = tasks.register("enumGeneratorTask", EnumGeneratorTask) {
+    commitHash = "2a42b85946a308d830984f54ea20349aa2beaeed" // https://github.com/Mojang/bedrock-protocol-docs
+    outputDirectory = enumSourceDir
 }
+tasks.compileJava.dependsOn(enumGeneratorTask)
+tasks.sourcesJar.dependsOn(enumGeneratorTask)
+
+sourceSets.main.java.srcDir(enumSourceDir)

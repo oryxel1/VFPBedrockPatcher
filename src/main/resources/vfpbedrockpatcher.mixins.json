@@ -1,16 +1,18 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "com.vfpbedrock.patcher.fabric.mixin",
+  "package": "com.vfpbedrock.patcher.mixins",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [
-  ],
   "client": [
+    "ClientPlayerPacketsMixins"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "overwrites": {
     "requireAnnotations": true
-  }
+  },
+  "mixins": [
+    "ProtocolTranslatorMixins"
+  ]
 }

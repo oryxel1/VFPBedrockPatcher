@@ -1,0 +1,14 @@
+plugins {
+    id "groovy-gradle-plugin"
+}
+
+repositories {
+    mavenCentral()
+    gradlePluginPortal()
+}
+
+dependencies {
+    implementation "org.trimou:trimou-core:2.5.1.Final"
+    implementation "org.jsoup:jsoup:1.21.1"
+    implementation "commons-io:commons-io:2.19.0"
+}
