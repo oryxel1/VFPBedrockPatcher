@@ -2,13 +2,11 @@ package com.vfpbedrock.patcher.mixins.local.entity;
 
 import com.viaversion.viafabricplus.ViaFabricPlus;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.passive.AbstractHorseEntity;
 import net.minecraft.entity.vehicle.AbstractBoatEntity;
 import net.minecraft.util.math.Vec3d;
-import net.raphimc.viabedrock.api.BedrockProtocolVersion;
 import net.raphimc.viabedrock.protocol.data.enums.bedrock.generated.PlayerAuthInputPacket_InputData;
 import net.raphimc.viabedrock.protocol.storage.EntityTracker;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,6 +16,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import static com.vfpbedrock.patcher.other.RandomMethods.canDoMixins;
+
 @Mixin(Entity.class)
 public abstract class EntityMixins {
     @Shadow
@@ -25,7 +25,7 @@ public abstract class EntityMixins {
 
     @Inject(method = "shouldControlVehicles", at = @At("HEAD"), cancellable = true)
     public void changeControlCondition(CallbackInfoReturnable<Boolean> cir) {
-        if (ViaFabricPlus.getImpl().getTargetVersion() != BedrockProtocolVersion.bedrockLatest) {
+        if (!canDoMixins(this, true, false)) {
             return;
         }
 
@@ -40,11 +40,7 @@ public abstract class EntityMixins {
 
     @Inject(method = "setSwimming", at = @At("HEAD"))
     public void updateSwimmingBedrock(boolean swimming, CallbackInfo ci) {
-        if (((Object)this) != MinecraftClient.getInstance().player) {
-            return;
-        }
-
-        if (ViaFabricPlus.getImpl().getTargetVersion() != BedrockProtocolVersion.bedrockLatest) {
+        if (!canDoMixins(this, true, true)) {
             return;
         }
 
@@ -60,11 +56,7 @@ public abstract class EntityMixins {
 
     @Inject(method = "move", at = @At("TAIL"))
     public void updateVerticalCollisionBedrock(MovementType type, Vec3d movement, CallbackInfo ci) {
-        if (((Object)this) != MinecraftClient.getInstance().player) {
-            return;
-        }
-
-        if (ViaFabricPlus.getImpl().getTargetVersion() != BedrockProtocolVersion.bedrockLatest) {
+        if (!canDoMixins(this, true, true)) {
             return;
         }
 

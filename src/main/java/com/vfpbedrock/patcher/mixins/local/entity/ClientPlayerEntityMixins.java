@@ -20,6 +20,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import static com.vfpbedrock.patcher.other.RandomMethods.canDoMixins;
+
 @Mixin(ClientPlayerEntity.class)
 public class ClientPlayerEntityMixins {
     @Redirect(method = "shouldStopSprinting", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isTouchingWater()Z"))
@@ -53,11 +55,7 @@ public class ClientPlayerEntityMixins {
 
     @Inject(method = "setCurrentHand", at = @At("HEAD"))
     public void startUsingItem(Hand hand, CallbackInfo ci) {
-        if (((Object)this) != MinecraftClient.getInstance().player) {
-            return;
-        }
-
-        if (ViaFabricPlus.getImpl().getTargetVersion() != BedrockProtocolVersion.bedrockLatest) {
+        if (!canDoMixins(this, true, true)) {
             return;
         }
 
@@ -71,11 +69,7 @@ public class ClientPlayerEntityMixins {
 
     @Inject(method = "sendMovementPackets", at = @At("HEAD"))
     public void doBedrockTeleport(CallbackInfo ci) {
-        if (((Object)this) != MinecraftClient.getInstance().player) {
-            return;
-        }
-
-        if (ViaFabricPlus.getImpl().getTargetVersion() != BedrockProtocolVersion.bedrockLatest) {
+        if (!canDoMixins(this, true, true)) {
             return;
         }
 
@@ -96,11 +90,7 @@ public class ClientPlayerEntityMixins {
 
     @Inject(method = "tick", at = @At(value = "TAIL"))
     public void addClientPredictedAuthData(CallbackInfo ci) {
-        if (((Object)this) != MinecraftClient.getInstance().player) {
-            return;
-        }
-
-        if (ViaFabricPlus.getImpl().getTargetVersion() != BedrockProtocolVersion.bedrockLatest) {
+        if (!canDoMixins(this, true, true)) {
             return;
         }
 

@@ -15,6 +15,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static com.vfpbedrock.patcher.other.RandomMethods.canDoMixins;
+
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixins {
     @Redirect(method = "applyFluidMovingSpeed", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isSprinting()Z"))
@@ -24,11 +26,7 @@ public abstract class LivingEntityMixins {
 
     @Inject(method = "jump", at = @At("HEAD"))
     public void addStartJumpingBedrock(CallbackInfo ci) {
-        if (((Object)this) != MinecraftClient.getInstance().player) {
-            return;
-        }
-
-        if (ViaFabricPlus.getImpl().getTargetVersion() != BedrockProtocolVersion.bedrockLatest) {
+        if (!canDoMixins(this, true, true)) {
             return;
         }
 
@@ -42,7 +40,7 @@ public abstract class LivingEntityMixins {
 
     @Inject(method = "stopGliding", at = @At("HEAD"))
     public void addStopGlidingBedrock1(CallbackInfo ci) {
-        if (((Object)this) != MinecraftClient.getInstance().player) {
+        if (!canDoMixins(this, false, true)) {
             return;
         }
 
@@ -51,7 +49,7 @@ public abstract class LivingEntityMixins {
 
     @Inject(method = "tickGliding", at = @At(value = "HEAD"))
     public void addStopGlidingBedrock2(CallbackInfo ci) {
-        if (((Object)this) != MinecraftClient.getInstance().player) {
+        if (!canDoMixins(this, false, true)) {
             return;
         }
 

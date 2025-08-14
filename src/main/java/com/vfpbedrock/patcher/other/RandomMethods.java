@@ -2,6 +2,7 @@ package com.vfpbedrock.patcher.other;
 
 import com.viaversion.viafabricplus.ViaFabricPlus;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerPosition;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
@@ -13,6 +14,13 @@ import net.raphimc.viabedrock.protocol.storage.EntityTracker;
 import java.util.Set;
 
 public class RandomMethods {
+    public static boolean canDoMixins(Object object, boolean version, boolean player) {
+        version = !version || ViaFabricPlus.getImpl().getTargetVersion() == BedrockProtocolVersion.bedrockLatest;
+        player = !player || object == MinecraftClient.getInstance().player;
+
+        return version && player;
+    }
+
     public static boolean setPosition(PlayerPosition pos, Set<PositionFlag> flags, Entity entity, boolean bl) {
         PlayerPosition playerPosition = PlayerPosition.fromEntity(entity);
         PlayerPosition playerPosition2 = PlayerPosition.apply(playerPosition, pos, flags);
