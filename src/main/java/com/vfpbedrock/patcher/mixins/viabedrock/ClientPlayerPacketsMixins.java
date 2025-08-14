@@ -4,8 +4,12 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.vfpbedrock.patcher.protocol.ExtraBedrockTypes;
 import com.vfpbedrock.patcher.protocol.model.InventoryAction;
 import com.vfpbedrock.patcher.protocol.model.InventorySource;
+import com.vfpbedrock.patcher.tracker.VehicleTracker;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.vehicle.AbstractBoatEntity;
+import net.minecraft.util.math.Vec3d;
 import net.raphimc.viabedrock.api.model.container.player.InventoryContainer;
 import net.raphimc.viabedrock.api.model.entity.ClientPlayerEntity;
 import net.raphimc.viabedrock.protocol.ServerboundBedrockPackets;
@@ -16,6 +20,8 @@ import net.raphimc.viabedrock.protocol.data.enums.bedrock.generated.ComplexInven
 import net.raphimc.viabedrock.protocol.data.enums.bedrock.generated.PlayerAuthInputPacket_InputData;
 import net.raphimc.viabedrock.protocol.data.enums.java.PlayerActionAction;
 import net.raphimc.viabedrock.protocol.model.BedrockItem;
+import net.raphimc.viabedrock.protocol.model.Position2f;
+import net.raphimc.viabedrock.protocol.model.Position3f;
 import net.raphimc.viabedrock.protocol.packet.ClientPlayerPackets;
 import net.raphimc.viabedrock.protocol.rewriter.ItemRewriter;
 import net.raphimc.viabedrock.protocol.storage.EntityTracker;
@@ -32,6 +38,42 @@ import java.util.List;
 
 @Mixin(value = ClientPlayerPackets.class, remap = false)
 public class ClientPlayerPacketsMixins {
+    @Redirect(method = "lambda$register$17", at = @At(value = "INVOKE", target = "Lnet/raphimc/viabedrock/api/model/entity/ClientPlayerEntity;position()" +
+            "Lnet/raphimc/viabedrock/protocol/model/Position3f;", ordinal = 1))
+    private static Position3f sendVehiclePosition(ClientPlayerEntity instance) {
+        final net.minecraft.client.network.ClientPlayerEntity player = MinecraftClient.getInstance().player;
+
+        if (player != null && player.getVehicle() != null) {
+            Vec3d pos = MinecraftClient.getInstance().player.getVehicle().getPos();
+            float offset = player.getVehicle() instanceof AbstractBoatEntity ? 0.35f : 0;
+            return new Position3f(
+                    Float.parseFloat(Double.toString(pos.x)),
+                    Float.parseFloat(Double.toString(pos.y)) + offset,
+                    Float.parseFloat(Double.toString(pos.z))
+            );
+        }
+
+        return instance.position();
+    }
+
+    @Inject(method = "lambda$register$17", at = @At(value = "INVOKE", target = "Lcom/viaversion/viaversion/api/protocol/packet/PacketWrapper;write" +
+            "(Lcom/viaversion/viaversion/api/type/Type;Ljava/lang/Object;)V", ordinal = 17))
+    private static void writeVehicleClientPredicted(PacketWrapper wrapper, CallbackInfo ci) {
+        final VehicleTracker vehicleTracker = wrapper.user().get(VehicleTracker.class);
+
+        final net.minecraft.client.network.ClientPlayerEntity player = MinecraftClient.getInstance().player;
+        if (wrapper.user().get(EntityTracker.class).getClientPlayer().authInputData().contains(PlayerAuthInputPacket_InputData.IsInClientPredictedVehicle) && vehicleTracker.vehicleRuntimeId() != -1) {
+            // Shouldn't happen, just in case.
+            if (player == null || player.getVehicle() == null) {
+                wrapper.write(BedrockTypes.POSITION_2F, new Position2f(0, 0));
+            } else {
+                wrapper.write(BedrockTypes.POSITION_2F, new Position2f(player.getVehicle().getPitch(), player.getVehicle().getYaw()));
+            }
+
+            wrapper.write(BedrockTypes.VAR_LONG, vehicleTracker.vehicleRuntimeId());
+        }
+    }
+
     @Redirect(method = "lambda$register$17", at = @At(value = "INVOKE", target = "Lnet/raphimc/viabedrock" +
             "/api/model/entity/ClientPlayerEntity;addAuthInputData" +
             "(Lnet/raphimc/viabedrock/protocol/data/enums/bedrock/generated/PlayerAuthInputPacket_InputData;)V", ordinal = 0))

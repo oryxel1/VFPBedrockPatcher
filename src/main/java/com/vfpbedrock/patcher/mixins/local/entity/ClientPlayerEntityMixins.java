@@ -61,4 +61,24 @@ public class ClientPlayerEntityMixins {
         RandomMethods.setPosition(packet.change(), packet.relatives(), (PlayerEntity) (Object) this, false);
         user.get(TeleportTracker.class).cachedTeleportPosition(null);
     }
+
+    @Inject(method = "tick", at = @At(value = "TAIL"))
+    public void addClientPredictedAuthData(CallbackInfo ci) {
+        if (((Object)this) != MinecraftClient.getInstance().player) {
+            return;
+        }
+
+        if (ViaFabricPlus.getImpl().getTargetVersion() != BedrockProtocolVersion.bedrockLatest) {
+            return;
+        }
+
+        final UserConnection user = ViaFabricPlus.getImpl().getPlayNetworkUserConnection();
+        if (user == null) {
+            return;
+        }
+
+        if (MinecraftClient.getInstance().player.getVehicle() != null && MinecraftClient.getInstance().player.getVehicle().shouldControlVehicles()) {
+            user.get(EntityTracker.class).getClientPlayer().addAuthInputData(PlayerAuthInputPacket_InputData.IsInClientPredictedVehicle);
+        }
+    }
 }

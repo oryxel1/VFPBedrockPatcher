@@ -1,7 +1,9 @@
 package com.vfpbedrock.patcher.mixins.viabedrock;
 
 import com.vfpbedrock.patcher.protocol.packets.ItemPackets;
+import com.vfpbedrock.patcher.protocol.packets.VehiclePackets;
 import com.vfpbedrock.patcher.tracker.TeleportTracker;
+import com.vfpbedrock.patcher.tracker.VehicleTracker;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import net.raphimc.viabedrock.protocol.BedrockProtocol;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,10 +17,12 @@ public class BedrockProtocolMixin {
     public void registerExtraPackets(CallbackInfo ci) {
         final BedrockProtocol protocol = (BedrockProtocol) (Object) this;
         ItemPackets.register(protocol);
+        VehiclePackets.register(protocol);
     }
 
     @Inject(method = "init", at = @At("TAIL"))
     public void putOtherStoredObjects(UserConnection user, CallbackInfo ci) {
         user.put(new TeleportTracker(user));
+        user.put(new VehicleTracker(user));
     }
 }
