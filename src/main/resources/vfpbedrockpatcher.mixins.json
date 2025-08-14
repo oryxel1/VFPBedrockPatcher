@@ -4,9 +4,11 @@
   "package": "com.vfpbedrock.patcher.mixins",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "local.entity.ClientPlayerEntityMixins",
     "local.entity.EntityMixins",
     "local.entity.LivingEntityMixins",
     "local.interaction.ClientPlayerInteractionManagerMixins",
+    "local.network.ClientPlayNetworkHandlerMixins",
     "vfp.ProtocolTranslatorMixins",
     "viabedrock.BedrockProtocolMixin",
     "viabedrock.ClientPlayerPacketsMixins"
@@ -16,5 +18,5 @@
   },
   "overwrites": {
     "requireAnnotations": true
-  },
+  }
 }
