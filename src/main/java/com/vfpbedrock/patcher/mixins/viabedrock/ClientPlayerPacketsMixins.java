@@ -1,4 +1,4 @@
-package com.vfpbedrock.patcher.mixins;
+package com.vfpbedrock.patcher.mixins.viabedrock;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.vfpbedrock.patcher.protocol.ExtraBedrockTypes;
@@ -42,7 +42,7 @@ public class ClientPlayerPacketsMixins {
         wrapper.setCancelled(false);
 
         // Ooops messy code :D, who cares.
-        // For release item and drop item, both is still the same regardless of the inventory auth mode.
+        // For release item and drop item, both is the same regardless of the inventory auth mode.
         ci.cancel();
         if (action != PlayerActionAction.RELEASE_USE_ITEM) {
             wrapper.setPacketType(ServerboundBedrockPackets.INVENTORY_TRANSACTION);

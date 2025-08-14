@@ -4,15 +4,15 @@
   "package": "com.vfpbedrock.patcher.mixins",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "ClientPlayerPacketsMixins"
+    "local.ClientPlayerInteractionManagerMixins",
+    "vfp.ProtocolTranslatorMixins",
+    "viabedrock.ClientPlayerPacketsMixins",
+    "viabedrock.BedrockProtocolMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "overwrites": {
     "requireAnnotations": true
-  },
-  "mixins": [
-    "ProtocolTranslatorMixins"
-  ]
+  }
 }

@@ -1,4 +1,4 @@
-package com.vfpbedrock.patcher.mixins;
+package com.vfpbedrock.patcher.mixins.vfp;
 
 import com.viaversion.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.lenni0451.reflect.stream.field.FieldWrapper;
