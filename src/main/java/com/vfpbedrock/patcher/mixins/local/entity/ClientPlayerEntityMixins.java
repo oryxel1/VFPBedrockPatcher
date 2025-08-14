@@ -9,16 +9,30 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.Vec2f;
 import net.raphimc.viabedrock.api.BedrockProtocolVersion;
 import net.raphimc.viabedrock.protocol.data.enums.bedrock.generated.PlayerAuthInputPacket_InputData;
 import net.raphimc.viabedrock.protocol.storage.EntityTracker;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ClientPlayerEntity.class)
 public class ClientPlayerEntityMixins {
+    @Redirect(method = "applyMovementSpeedFactors", at = @At(value = "INVOKE", target =
+            "Lnet/minecraft/util/math/Vec2f;multiply(F)Lnet/minecraft/util/math/Vec2f;", ordinal = 1))
+    public Vec2f changeItemSlowdownBedrock(Vec2f instance, float value) {
+        return instance.multiply(0.122499995F);
+    }
+
+    @Inject(method = "applyDirectionalMovementSpeedFactors", at = @At(value = "HEAD"), cancellable = true)
+    private static void changeInputNormalizeBedrock(Vec2f vec, CallbackInfoReturnable<Vec2f> cir) {
+        cir.setReturnValue(vec);
+    }
+
     @Inject(method = "setCurrentHand", at = @At("HEAD"))
     public void startUsingItem(Hand hand, CallbackInfo ci) {
         if (((Object)this) != MinecraftClient.getInstance().player) {
