@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
-public class EntityMixins {
+public abstract class EntityMixins {
     @Shadow
     public boolean verticalCollision;
 
@@ -36,6 +36,26 @@ public class EntityMixins {
 
         Entity entity = (Entity) (Object) this;
         cir.setReturnValue(entity instanceof AbstractBoatEntity || entity instanceof AbstractHorseEntity);
+    }
+
+    @Inject(method = "setSwimming", at = @At("HEAD"))
+    public void updateSwimmingBedrock(boolean swimming, CallbackInfo ci) {
+        if (((Object)this) != MinecraftClient.getInstance().player) {
+            return;
+        }
+
+        if (ViaFabricPlus.getImpl().getTargetVersion() != BedrockProtocolVersion.bedrockLatest) {
+            return;
+        }
+
+        final UserConnection user = ViaFabricPlus.getImpl().getPlayNetworkUserConnection();
+        if (user == null) {
+            return;
+        }
+
+        if (swimming != isSwimming()) {
+            user.get(EntityTracker.class).getClientPlayer().addAuthInputData(swimming ? PlayerAuthInputPacket_InputData.StartSwimming : PlayerAuthInputPacket_InputData.StopSwimming);
+        }
     }
 
     @Inject(method = "move", at = @At("TAIL"))
@@ -57,4 +77,7 @@ public class EntityMixins {
             user.get(EntityTracker.class).getClientPlayer().addAuthInputData(PlayerAuthInputPacket_InputData.VerticalCollision);
         }
     }
+
+    @Shadow
+    public abstract boolean isSwimming();
 }
