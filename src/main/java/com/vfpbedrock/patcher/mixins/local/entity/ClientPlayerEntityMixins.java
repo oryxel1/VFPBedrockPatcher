@@ -22,14 +22,32 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ClientPlayerEntity.class)
 public class ClientPlayerEntityMixins {
+    @Redirect(method = "shouldStopSprinting", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isTouchingWater()Z"))
+    private boolean preventStopSprintInWaterBedrock(ClientPlayerEntity instance) {
+        return instance.isTouchingWater() && ViaFabricPlus.getImpl().getTargetVersion() != BedrockProtocolVersion.bedrockLatest;
+    }
+
+    @Redirect(method = "canStartSprinting", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isTouchingWater()Z"))
+    private boolean allowStartSprintInWaterBedrock(ClientPlayerEntity instance) {
+        return instance.isTouchingWater() && ViaFabricPlus.getImpl().getTargetVersion() != BedrockProtocolVersion.bedrockLatest;
+    }
+
     @Redirect(method = "applyMovementSpeedFactors", at = @At(value = "INVOKE", target =
             "Lnet/minecraft/util/math/Vec2f;multiply(F)Lnet/minecraft/util/math/Vec2f;", ordinal = 1))
     public Vec2f changeItemSlowdownBedrock(Vec2f instance, float value) {
+        if (ViaFabricPlus.getImpl().getTargetVersion() != BedrockProtocolVersion.bedrockLatest) {
+            return instance.multiply(0.2F);
+        }
+
         return instance.multiply(0.122499995F);
     }
 
     @Inject(method = "applyDirectionalMovementSpeedFactors", at = @At(value = "HEAD"), cancellable = true)
     private static void changeInputNormalizeBedrock(Vec2f vec, CallbackInfoReturnable<Vec2f> cir) {
+        if (ViaFabricPlus.getImpl().getTargetVersion() != BedrockProtocolVersion.bedrockLatest) {
+            return;
+        }
+
         cir.setReturnValue(vec);
     }
 
