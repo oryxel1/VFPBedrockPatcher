@@ -7,11 +7,13 @@ import com.vfpbedrock.patcher.protocol.model.InventorySource;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import net.raphimc.viabedrock.api.model.container.player.InventoryContainer;
+import net.raphimc.viabedrock.api.model.entity.ClientPlayerEntity;
 import net.raphimc.viabedrock.protocol.ServerboundBedrockPackets;
 import net.raphimc.viabedrock.protocol.data.enums.bedrock.ContainerID;
 import net.raphimc.viabedrock.protocol.data.enums.bedrock.InventorySourceType;
 import net.raphimc.viabedrock.protocol.data.enums.bedrock.InventorySource_InventorySourceFlags;
 import net.raphimc.viabedrock.protocol.data.enums.bedrock.generated.ComplexInventoryTransaction_Type;
+import net.raphimc.viabedrock.protocol.data.enums.bedrock.generated.PlayerAuthInputPacket_InputData;
 import net.raphimc.viabedrock.protocol.data.enums.java.PlayerActionAction;
 import net.raphimc.viabedrock.protocol.model.BedrockItem;
 import net.raphimc.viabedrock.protocol.packet.ClientPlayerPackets;
@@ -22,6 +24,7 @@ import net.raphimc.viabedrock.protocol.types.BedrockTypes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
@@ -29,6 +32,13 @@ import java.util.List;
 
 @Mixin(value = ClientPlayerPackets.class, remap = false)
 public class ClientPlayerPacketsMixins {
+    @Redirect(method = "lambda$register$17", at = @At(value = "INVOKE", target = "Lnet/raphimc/viabedrock" +
+            "/api/model/entity/ClientPlayerEntity;addAuthInputData" +
+            "(Lnet/raphimc/viabedrock/protocol/data/enums/bedrock/generated/PlayerAuthInputPacket_InputData;)V", ordinal = 0))
+    private static void cancelStartJumping(ClientPlayerEntity instance, PlayerAuthInputPacket_InputData data) {
+        // Don't do anything since we already handle this in LivingEntityMixins#addStartJumpingBedrock
+    }
+
     @Inject(method = "lambda$register$9", at = @At(value = "INVOKE",
             target = "Lcom/viaversion/viaversion/api/protocol/packet/PacketWrapper;read(Lcom/viaversion/viaversion/api/type/Type;)Ljava/lang/Object;",
     ordinal = 3, shift = At.Shift.AFTER), cancellable = true)

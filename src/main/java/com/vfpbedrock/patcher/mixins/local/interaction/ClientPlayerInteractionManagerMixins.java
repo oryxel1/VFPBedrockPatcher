@@ -1,4 +1,4 @@
-package com.vfpbedrock.patcher.mixins.local;
+package com.vfpbedrock.patcher.mixins.local.interaction;
 
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import org.spongepowered.asm.mixin.Mixin;

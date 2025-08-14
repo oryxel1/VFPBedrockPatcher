@@ -4,15 +4,17 @@
   "package": "com.vfpbedrock.patcher.mixins",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "local.ClientPlayerInteractionManagerMixins",
+    "local.entity.EntityMixins",
+    "local.entity.LivingEntityMixins",
+    "local.interaction.ClientPlayerInteractionManagerMixins",
     "vfp.ProtocolTranslatorMixins",
-    "viabedrock.ClientPlayerPacketsMixins",
-    "viabedrock.BedrockProtocolMixin"
+    "viabedrock.BedrockProtocolMixin",
+    "viabedrock.ClientPlayerPacketsMixins"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "overwrites": {
     "requireAnnotations": true
-  }
+  },
 }
