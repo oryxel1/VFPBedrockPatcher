@@ -7,6 +7,7 @@ import com.vfpbedrock.patcher.protocol.model.InventorySource;
 import com.vfpbedrock.patcher.tracker.VehicleTracker;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.vehicle.AbstractBoatEntity;
 import net.minecraft.util.math.Vec3d;
@@ -19,6 +20,7 @@ import net.raphimc.viabedrock.protocol.data.enums.bedrock.InventorySource_Invent
 import net.raphimc.viabedrock.protocol.data.enums.bedrock.generated.ComplexInventoryTransaction_Type;
 import net.raphimc.viabedrock.protocol.data.enums.bedrock.generated.PlayerAuthInputPacket_InputData;
 import net.raphimc.viabedrock.protocol.data.enums.java.PlayerActionAction;
+import net.raphimc.viabedrock.protocol.data.enums.java.PlayerCommandAction;
 import net.raphimc.viabedrock.protocol.model.BedrockItem;
 import net.raphimc.viabedrock.protocol.model.Position2f;
 import net.raphimc.viabedrock.protocol.model.Position3f;
@@ -38,6 +40,30 @@ import java.util.List;
 
 @Mixin(value = ClientPlayerPackets.class, remap = false)
 public class ClientPlayerPacketsMixins {
+    @Inject(method = "lambda$register$8", at = @At(value = "HEAD"), cancellable = true)
+    private static void registerMorePlayerCommands(PacketWrapper wrapper, CallbackInfo ci) {
+        ci.cancel();
+
+        wrapper.cancel();
+        final ClientPlayerEntity clientPlayer = wrapper.user().get(EntityTracker.class).getClientPlayer();
+        wrapper.read(Types.VAR_INT); // entity id
+        final PlayerCommandAction action = PlayerCommandAction.values()[wrapper.read(Types.VAR_INT)]; // action
+        final int data = wrapper.read(Types.VAR_INT); // data
+
+        switch (action) {
+            case START_SPRINTING -> {
+                clientPlayer.setSprinting(true);
+                clientPlayer.addAuthInputData(PlayerAuthInputPacket_InputData.StartSprinting);
+            }
+            case STOP_SPRINTING -> {
+                clientPlayer.setSprinting(false);
+                clientPlayer.addAuthInputData(PlayerAuthInputPacket_InputData.StopSprinting);
+            }
+            case START_FALL_FLYING -> clientPlayer.addAuthInputData(PlayerAuthInputPacket_InputData.StartGliding);
+            default -> throw new IllegalStateException("Unhandled PlayerCommandAction: " + action);
+        }
+    }
+
     @Redirect(method = "lambda$register$17", at = @At(value = "INVOKE", target = "Lnet/raphimc/viabedrock/api/model/entity/ClientPlayerEntity;position()" +
             "Lnet/raphimc/viabedrock/protocol/model/Position3f;", ordinal = 1))
     private static Position3f sendVehiclePosition(ClientPlayerEntity instance) {

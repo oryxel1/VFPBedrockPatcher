@@ -1,9 +1,14 @@
 package com.vfpbedrock.patcher.other;
 
+import com.viaversion.viafabricplus.ViaFabricPlus;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerPosition;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.util.math.Vec3d;
+import net.raphimc.viabedrock.api.BedrockProtocolVersion;
+import net.raphimc.viabedrock.protocol.data.enums.bedrock.generated.PlayerAuthInputPacket_InputData;
+import net.raphimc.viabedrock.protocol.storage.EntityTracker;
 
 import java.util.Set;
 
@@ -26,5 +31,18 @@ public class RandomMethods {
             entity.setLastPositionAndAngles(playerPosition4.position(), playerPosition4.yaw(), playerPosition4.pitch());
             return false;
         }
+    }
+
+    public static void stopGliding() {
+        if (ViaFabricPlus.getImpl().getTargetVersion() != BedrockProtocolVersion.bedrockLatest) {
+            return;
+        }
+
+        final UserConnection user = ViaFabricPlus.getImpl().getPlayNetworkUserConnection();
+        if (user == null) {
+            return;
+        }
+
+        user.get(EntityTracker.class).getClientPlayer().addAuthInputData(PlayerAuthInputPacket_InputData.StopGliding);
     }
 }
