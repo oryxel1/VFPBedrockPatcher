@@ -56,6 +56,6 @@ public class VehiclePackets {
             }
 
             wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, ridersJava);
-        });
+        }, true);
     }
 }

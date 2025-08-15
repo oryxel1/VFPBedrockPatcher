@@ -54,6 +54,6 @@ public class ItemPackets {
 
             wrapper.write(BedrockTypes.UNSIGNED_VAR_INT, 0); // block runtime id
             wrapper.write(BedrockTypes.UNSIGNED_VAR_INT, ItemUseInventoryTransaction_PredictedResult.Failure.getValue()); // predicted result.
-        });
+        }, true);
     }
 }

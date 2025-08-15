@@ -8,15 +8,20 @@
     "local.entity.EntityMixins",
     "local.entity.LivingEntityMixins",
     "local.interaction.ClientPlayerInteractionManagerMixins",
-    "local.network.ClientPlayNetworkHandlerMixins",
-    "vfp.ProtocolTranslatorMixins",
-    "viabedrock.BedrockProtocolMixin",
-    "viabedrock.ClientPlayerPacketsMixins"
+    "local.network.ClientPlayNetworkHandlerMixins"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "overwrites": {
     "requireAnnotations": true
-  }
+  },
+  "mixins": [
+    "local.block.BlockMixins",
+    "vfp.ProtocolTranslatorMixins",
+    "viabedrock.BedrockBlockStateMixins",
+    "viabedrock.BedrockProtocolMixin",
+    "viabedrock.BlockStateRewriterMixins",
+    "viabedrock.ClientPlayerPacketsMixins"
+  ]
 }
