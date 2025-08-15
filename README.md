@@ -6,6 +6,7 @@ Various fixes and improvements to make ViaBedrock playable on VFP.
 - Fixed block breaking in protected area.
 - Added support for custom block collision.
 - Added support for dropping item, item usage, releasing item.
+- Added support for entity container.
 - More accurate input data related to PlayerAuthInput packet.
 - (somewhat) working vehicle related packets.
 - Translate start/stop gliding/swimming.
