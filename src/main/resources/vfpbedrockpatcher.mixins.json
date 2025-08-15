@@ -20,8 +20,11 @@
     "local.block.BlockMixins",
     "vfp.ProtocolTranslatorMixins",
     "viabedrock.BedrockBlockStateMixins",
+    "viabedrock.BedrockContainerMixin",
     "viabedrock.BedrockProtocolMixin",
     "viabedrock.BlockStateRewriterMixins",
-    "viabedrock.ClientPlayerPacketsMixins"
+    "viabedrock.ClientPlayerPacketsMixins",
+    "viabedrock.InventoryPacketsMixins",
+    "viabedrock.InventoryTrackerMixins"
   ]
 }
