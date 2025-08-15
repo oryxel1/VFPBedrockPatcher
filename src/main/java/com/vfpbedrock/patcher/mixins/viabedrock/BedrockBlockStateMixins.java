@@ -22,7 +22,6 @@ public class BedrockBlockStateMixins implements IBedrockBlockState {
     @Inject(method = "fromNbt", at = @At("TAIL"), cancellable = true)
     private static void cacheCollisionAndSelectionBox(CompoundTag tag, CallbackInfoReturnable<BedrockBlockState> cir) {
         BedrockBlockState state = cir.getReturnValue();
-        System.out.println();
         if (tag.contains("minecraft:collision_box")) {
             final CompoundTag collision = tag.getCompoundTag("minecraft:collision_box");
 
@@ -52,8 +51,6 @@ public class BedrockBlockStateMixins implements IBedrockBlockState {
                 ((IBedrockBlockState)state).vfpbedrockpatcher$selectionBox(VoxelShapes.cuboidUnchecked(0, 0, 0, 0, 0, 0));
             }
         }
-
-        System.out.println(tag.getStringTag("name") + " -> " + ((IBedrockBlockState)state).vfpbedrockpatcher$collisionBox());
     }
 
     @Override
