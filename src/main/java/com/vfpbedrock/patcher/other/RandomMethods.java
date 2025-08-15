@@ -30,7 +30,7 @@ public class RandomMethods {
         return true;
     }
 
-    // TODO: IS THIS CORRECT?
+    // TODO: Is this correct?
     public static VoxelShape boxComponentToVoxel(CompoundTag collision) {
         @Nullable ListTag<FloatTag> origin = (ListTag<FloatTag>) collision.getNumberListTag("origin");
         @Nullable ListTag<FloatTag> size = (ListTag<FloatTag>) collision.getNumberListTag("size");
@@ -39,8 +39,8 @@ public class RandomMethods {
         float minY = origin.get(1).getValue() / 16F;
         float minZ = (origin.get(2).getValue() + 8F) / 16F;
         float maxX = minX + size.get(0).getValue() / 16F;
-        float maxY = minY + size.get(0).getValue() / 16F;
-        float maxZ = minZ + size.get(0).getValue() / 16F;
+        float maxY = minY + (size.get(1).getValue() / 16F);
+        float maxZ = minZ + (size.get(2).getValue() / 16F);
 
         return VoxelShapes.cuboidUnchecked(minX, minY, minZ, maxX, maxY, maxZ);
     }
