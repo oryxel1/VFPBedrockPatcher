@@ -107,6 +107,18 @@ public class ClientPlayerPacketsMixins {
         // Don't do anything since we already handle this in LivingEntityMixins#addStartJumpingBedrock
     }
 
+    @Redirect(method = "lambda$register$17", at = @At(value = "NEW", target = "(FFF)Lnet/raphimc/viabedrock/protocol/model/Position3f;"))
+    private static Position3f correctTickEnd(float x, float y, float z) {
+        final net.minecraft.client.network.ClientPlayerEntity player = MinecraftClient.getInstance().player;
+        if (player != null) {
+            x = (float) player.getVelocity().x;
+            y = (float) player.getVelocity().y;
+            z = (float) player.getVelocity().z;
+        }
+
+        return new Position3f(x, y, z);
+    }
+
     @Inject(method = "lambda$register$9", at = @At(value = "INVOKE",
             target = "Lcom/viaversion/viaversion/api/protocol/packet/PacketWrapper;read(Lcom/viaversion/viaversion/api/type/Type;)Ljava/lang/Object;",
     ordinal = 3, shift = At.Shift.AFTER), cancellable = true)
