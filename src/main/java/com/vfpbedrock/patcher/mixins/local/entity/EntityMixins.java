@@ -2,6 +2,7 @@ package com.vfpbedrock.patcher.mixins.local.entity;
 
 import com.viaversion.viafabricplus.ViaFabricPlus;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.passive.AbstractHorseEntity;
@@ -69,6 +70,31 @@ public abstract class EntityMixins {
             user.get(EntityTracker.class).getClientPlayer().addAuthInputData(PlayerAuthInputPacket_InputData.VerticalCollision);
         }
     }
+
+    @Shadow
+    protected Vec3d movementMultiplier;
+
+    @Inject(method = "slowMovement", at = @At("HEAD"), cancellable = true)
+    public void bedrockSlowMovement(BlockState state, Vec3d multiplier, CallbackInfo ci) {
+        if (!canDoMixins(this, true, true)) {
+            return;
+        }
+        ci.cancel();
+        onLanding();
+
+        if (this.movementMultiplier != null && this.movementMultiplier.lengthSquared() > 1.0E-7) {
+            this.movementMultiplier = new Vec3d(
+                    Math.min(movementMultiplier.x, multiplier.x),
+                    Math.min(movementMultiplier.y, multiplier.y),
+                    Math.min(movementMultiplier.z, multiplier.z)
+            );
+        } else {
+            this.movementMultiplier = multiplier;
+        }
+    }
+
+    @Shadow
+    public abstract void onLanding();
 
     @Shadow
     public abstract boolean isSwimming();
