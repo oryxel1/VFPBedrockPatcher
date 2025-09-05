@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -23,6 +24,14 @@ import static com.vfpbedrock.patcher.other.RandomMethods.canDoMixins;
 public abstract class EntityMixins {
     @Shadow
     public boolean verticalCollision;
+
+    @Redirect(method = "setPosition(DDD)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;setPos(DDD)V"))
+    public void setPos(Entity instance, double x, double y, double z) {
+        float floatX = (float) x, floatY = (float) y, floatZ = (float) z;
+
+        // Simulate floating point errors like on Bedrock.
+        instance.setPos(floatX, floatY, floatZ);
+    }
 
     @Inject(method = "shouldControlVehicles", at = @At("HEAD"), cancellable = true)
     public void changeControlCondition(CallbackInfoReturnable<Boolean> cir) {
