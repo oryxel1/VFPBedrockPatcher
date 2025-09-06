@@ -27,6 +27,11 @@ public abstract class EntityMixins {
 
     @Redirect(method = "setPosition(DDD)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;setPos(DDD)V"))
     public void setPos(Entity instance, double x, double y, double z) {
+        if (!canDoMixins(this, true, true)) {
+            instance.setPos(x, y, z);
+            return;
+        }
+
         float floatX = (float) x, floatY = (float) y, floatZ = (float) z;
 
         // Simulate floating point errors like on Bedrock.
